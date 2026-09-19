@@ -296,16 +296,14 @@ The vertical line represents the object's lifetime during the interaction.
 A **message** represents communication between two objects.
 
 ```text
-A ─────────> B
-    message
+A ── message() ──▶ B
 ```
 
 Example:
 
-```text
-ATM ────────> Account
-       verifyAccount()
-```
+![UML synchronous message](assets/uml/synchronous-message.png)
+
+The filled arrowhead represents a synchronous operation call.
 
 ---
 
@@ -313,11 +311,23 @@ ATM ────────> Account
 
 ### Definition
 
-A **synchronous message** means the sender waits for the receiver to complete the operation/return a response.
+A **synchronous message** is usually an operation call where the sender waits for the receiver to complete the operation before continuing.
 
 ```text
-A ─────────> B
+A ─────────▶ B
 ```
+
+### UML Notation
+
+- Solid line with a **filled arrowhead**.
+- Usually represents a method or operation call.
+- The receiver processes the call before the sender continues.
+
+Example:
+
+![UML synchronous message with filled arrowhead](assets/uml/synchronous-message.png)
+
+The sender waits while the receiver processes the operation.
 
 ### Rule
 
@@ -335,11 +345,23 @@ Continue execution
 
 ### Definition
 
-An **asynchronous message** means the sender does not wait for the receiver to complete the operation.
+An **asynchronous message** means the sender sends the message and continues without waiting for the receiver to complete the operation.
 
 ```text
-A - - - - -> B
+A ─────────▷ B
 ```
+
+### UML Notation
+
+- Solid line with an **open arrowhead**.
+- The receiver may process the message independently.
+- A signal is an asynchronous message that does not expect a reply.
+
+Example:
+
+![UML asynchronous message](assets/uml/asynchronous-message.png)
+
+The open arrowhead represents an asynchronous signal. The sender continues without waiting.
 
 ### Rule
 
@@ -348,6 +370,46 @@ Send request
      ↓
 Continue execution
 ```
+
+### Synchronous vs Asynchronous
+
+| Message type | Line and arrowhead | Sender behavior | Typical example |
+|---|---|---|---|
+| Synchronous | Solid line with filled arrowhead | Waits for completion or a response | `verifyAccount()` |
+| Asynchronous | Solid line with open arrowhead | Continues immediately | `publishEmail()` |
+| Return | Dashed line with open arrowhead | Sends the result back | `accountVerified` |
+
+> Do not use a dashed line to represent an asynchronous message. In UML, a dashed line with an open arrowhead represents a return message.
+
+Return example:
+
+![UML return message](assets/uml/return-message.png)
+
+The dashed line with an open arrowhead represents the response returned by the receiver.
+
+Reference: [Visual Paradigm sequence diagram messages](https://www.visual-paradigm.com/learning/handbooks/software-design-handbook/sequence-diagram.jsp)
+
+### Complete Message Flow
+
+The following flow shows a synchronous request, its response, and an asynchronous message:
+
+```text
+ATM                  Account              NotificationQueue
+ │                      │                         │
+ │── verifyAccount() ──▶│                         │
+ │                      │                         │
+ │◁ - - accountVerified - -│                      │
+ │                      │                         │
+ │── publishReceipt() ──────────────────────────▷│
+ │                      │                         │
+ │   continues without waiting                  │
+```
+
+In this flow:
+
+1. `ATM` sends `verifyAccount()` synchronously and waits for `Account`.
+2. `Account` returns `accountVerified` using a dashed line with an open arrowhead.
+3. `ATM` sends `publishReceipt()` asynchronously to `NotificationQueue` and continues immediately.
 
 ---
 
